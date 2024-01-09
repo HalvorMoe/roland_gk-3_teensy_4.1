@@ -9,8 +9,28 @@ WINDOW_SIZE = 48000 # window size of the DFT in samples
 WINDOW_STEP = 12000 # step size of window
 NUM_HPS = 5 # max number of harmonic product spectrums
 POWER_THRESH = 1e-6 # tuning is activated if the signal power exceeds this threshold
-
 HANN_WINDOW = np.hanning(WINDOW_SIZE)
+
+E_string_frequencies = {
+    82.41: 0, 87.31: 1, 92.50: 2, 98.00: 3, 103.83: 4, 
+    110.00: 5, 116.54: 6, 123.47: 7, 130.81: 8, 138.59: 9, 
+    146.83: 10, 155.56: 11, 164.81: 12, 174.61: 13, 185.00: 14, 
+    196.00: 15, 207.65: 16, 220.00: 17, 233.08: 18, 246.94: 19, 
+    329.63: 20
+}
+
+def find_closest_fret(frequency, frequency_mapping):
+    """
+    This function finds the closest fret for a given frequency on the E string.
+    Parameters:
+        frequency (float): The detected frequency.
+        frequency_mapping (dict): Mapping of frequencies to fret numbers.
+    Returns:
+        closest_fret (int): The fret number that is closest to the detected frequency.
+    """
+    closest_frequency = min(frequency_mapping.keys(), key=lambda x:abs(x-frequency))
+    return frequency_mapping[closest_frequency]
+
 def callback(indata, frames, time, status):
   if not hasattr(callback, "window_samples"):
     callback.window_samples = [0 for _ in range(WINDOW_SIZE)]
@@ -40,7 +60,8 @@ def callback(indata, frames, time, status):
     max_freq = max_ind * (SAMPLE_FREQ/WINDOW_SIZE) / NUM_HPS
     max_freq = round(max_freq, 1)
 
-    print(f"Frequency: {max_freq} Hz")
+    closest_fret = find_closest_fret(max_freq, E_string_frequencies)
+    print(closest_fret)
 
 try:
   print("Starting HPS guitar tuner...")
