@@ -92,7 +92,7 @@ def callback(indata, frames, time, status):
 
 try:
   print("Starting HPS guitar tuner...")
-  with sd.InputStream(channels=1, callback=callback, blocksize=WINDOW_STEP, samplerate=SAMPLE_FREQ, device=18):
+  with sd.InputStream(channels=1, callback=callback, blocksize=WINDOW_STEP, samplerate=SAMPLE_FREQ, device=1):
     while True:
       time.sleep(0) # reduced sleep time to update frequency faster
 except Exception as exc:
