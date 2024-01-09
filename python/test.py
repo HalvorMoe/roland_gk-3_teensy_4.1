@@ -3,7 +3,7 @@ import sounddevice as sd
 
 sample_rate = 48000  # Samples per second
 chunk_size = 512    # Number of samples per chunk
-18
+
 def list_devices():
     print("Available audio devices:")
     devices = sd.query_devices()
@@ -11,12 +11,21 @@ def list_devices():
         print(f"{i}: {dev['name']}")
 
 def process_chunk(data):
-    # Perform FFT
-    fft_result = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(data)) * sample_rate
+    # Apply a windowing function (Hanning in this case)
+    windowed_data = data * np.hanning(len(data))
 
-    # Find the dominant frequency
-    peak_freq = freqs[np.argmax(np.abs(fft_result))]
+    # Zero padding
+    padded_data = np.zeros(sample_rate)
+    padded_data[:len(windowed_data)] = windowed_data
+
+    # Perform FFT
+    fft_result = np.fft.fft(padded_data)
+    freqs = np.fft.fftfreq(len(padded_data)) * sample_rate
+
+    # Find the dominant frequency using the magnitude spectrum
+    magnitude = np.abs(fft_result)
+    peak_freq = freqs[np.argmax(magnitude)]
+
     return abs(peak_freq)
 
 def callback(indata, frames, time, status):
