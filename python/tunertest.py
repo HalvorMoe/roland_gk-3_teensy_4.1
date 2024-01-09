@@ -8,7 +8,7 @@ import neopixel
 # Setup for Neopixels
 PIXEL_PIN = board.D18
 NUM_PIXELS = 144
-LED_PER_FRET = 7
+LED_PER_FRET = 2
 NUM_FRETS = 20
 # Initialize the strip
 pixels = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS)
@@ -42,7 +42,7 @@ def light_up_fret(fret):
         for i in range(start_led, start_led + LED_PER_FRET):
             # Avoid trying to light up a LED that doesn't exist
             if i < NUM_PIXELS:
-                pixels[i] = (255, 255, 255)  # White color, for example
+                pixels[i] = (0, 255, 0)  # White color, for example
     pixels.show()
 
 def find_closest_fret(frequency, frequency_mapping):
