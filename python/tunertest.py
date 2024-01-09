@@ -2,6 +2,16 @@ import numpy as np
 import scipy.fftpack
 import sounddevice as sd
 import time
+import board
+import neopixel
+
+# Setup for Neopixels
+PIXEL_PIN = board.D18
+NUM_PIXELS = 144
+LED_PER_FRET = 7
+NUM_FRETS = 20
+# Initialize the strip
+pixels = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS)
 
 # General settings that can be changed by the user
 SAMPLE_FREQ = 48000 # sample frequency in Hz
@@ -18,6 +28,22 @@ E_string_frequencies = {
     196.00: 15, 207.65: 16, 220.00: 17, 233.08: 18, 246.94: 19, 
     329.63: 20
 }
+
+def light_up_fret(fret):
+    """
+    Lights up the LEDs corresponding to the fret number.
+    """
+    # Turn off all the lights
+    pixels.fill((0, 0, 0))
+    
+    if fret <= NUM_FRETS:
+        # Calculate the starting LED index for the fret
+        start_led = fret * LED_PER_FRET
+        for i in range(start_led, start_led + LED_PER_FRET):
+            # Avoid trying to light up a LED that doesn't exist
+            if i < NUM_PIXELS:
+                pixels[i] = (255, 255, 255)  # White color, for example
+    pixels.show()
 
 def find_closest_fret(frequency, frequency_mapping):
     """
@@ -62,6 +88,7 @@ def callback(indata, frames, time, status):
 
     closest_fret = find_closest_fret(max_freq, E_string_frequencies)
     print(closest_fret)
+    light_up_fret(closest_fret)
 
 try:
   print("Starting HPS guitar tuner...")
